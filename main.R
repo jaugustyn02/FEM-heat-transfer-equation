@@ -6,23 +6,24 @@ repeat {
     if (n > 0) break
 }
 
+# n <- 4
+
 # Dziedzina x należy do [a,b]
 a <- 0
 b <- 2
 
 # liczba przedziałów
 num_bfn <- n + 1
-# Długość pojedynczego przedziału
+
+# długość pojedynczego przedziału
 interval_len <- (b - a) / n
 
 
-# helper functions
-
+# helper function
 between <- function(x, a, b) {
     return(a <= x && x <= b)
 }
 
-######################################
 
 # początek, środek i koniec przedziału funkcji bazowej ei
 ex <- function(i) {
@@ -30,16 +31,15 @@ ex <- function(i) {
     return(c(xi - interval_len, xi, xi + interval_len))
 }
 
-# --0----2/3------4/3-----2--------->
-
-a1 <- 1 / interval_len
-a2 <- -a1
+# współczynniki liniowe funkcji bazowych
+a1 <- (1 / interval_len)
+a2 <- (-a1)
 
 # funkcje bazowe
 e <- function(i, x) {
     xs <- ex(i)
     if (between(x, xs[1], xs[2]))
-        return(a1 * x - i)
+        return(a1 * x - i + 2)
     if (between(x, xs[2], xs[3]))
         return(a2 * x + i)
     return(0)
@@ -48,14 +48,17 @@ e <- function(i, x) {
 # pochodne funkcji bazowych
 e_prim <- function(i, x) {
     xs <- ex(i)
-    if (between(x, xs[1], xs[2]))
+    if (between(x, xs[1], xs[2])){
         return(a1)
-    if (between(x, xs[2], xs[3]))
+    }
+    if (between(x, xs[2], xs[3])){
         return(a2)
+    }
     return(0)
 }
 
-# Całkowanie kwadraturą Gaussa-Legendre'a dla 2 punktów Gaussa                                                              # nolint                                                            # nolint
+
+# całkowanie kwadraturą Gaussa-Legendre'a dla 2 punktów Gaussa                                                              # nolint                                                            # nolint
 def_integral <- function(F, a, b) {                                     # nolint
     A <- c(1, 1)                                                        # nolint
     c <- (b - a) / 2
@@ -64,11 +67,12 @@ def_integral <- function(F, a, b) {                                     # nolint
     return(c * sum(sapply(c * u + d, F) * A))                           # nolint
 }
 
-# Prawa strona sformulowania wariacyjnego L(v)
+# prawa strona sformulowania wariacyjnego L(v)
 L <- function(i, x) {
     return(20 * e(i, x))
 }
 
+# iloczyn pochodnych funkcji bazowych
 e_prims_product <- function(i, j) {
     return(
         function(x) {
@@ -77,18 +81,19 @@ e_prims_product <- function(i, j) {
     )
 }
 
-# Lewa strona sformulowania wariacyjnego B(u,v)
+# lewa strona sformulowania wariacyjnego B(u,v)
 B <- function(i, j) {
-    lower <- min(ex(i), ex(j), 0)
-    upper <- max(ex(i), ex(j), 0)
+    lower <- max(0, ex(i)[1], ex(i)[1])
+    upper <- min(ex(i)[3], ex(i)[3])
     return(e(i, 0) * e(j, 0) - def_integral(e_prims_product(i, j), lower, upper)) # nolint
 }
 
+# znalezienie rozwiązania równania
 solution <- function() {
     M <- matrix(0, num_bfn, num_bfn)
     for (i in 1:num_bfn){
         for (j in 1:num_bfn){
-            M[i, j] <- B(j, i)
+            M[i, j] <- B(i, j)
         }
     }
 
@@ -97,90 +102,51 @@ solution <- function() {
         C[i, 1] <- L(i, 0)
     }
 
-
-    W <- solve(M, C)
-
-    print(W)
-
+    U <- solve(M, C)
+    
     return(
-        function(x){
-            return(sum(W * rep(e(i, x), num_bfn)))
+        function(x) {
+            return(sum(mapply(
+                function(i, x) {U[i] * e(i, x)},
+                seq(1, num_bfn, 1), x))
+            )
         }
     )
 }
 
-plot_result <- function(){
-  u = solution()
-  plot(seq(a, b, 1/(100*num_bfn)), 
-       mapply(u, seq(a, b, 1/(100 * num_bfn))),
-       main = 'Rozwiązanie równania transportu ciepła',
-       xlab=' ',
-       ylab=' ',
-       type='l')
+# tworzenie wykresu rozwiązania równania
+plot_result <- function() {
+    u <- solution()
+    x <- seq(a, b, 1 / (100 * n))
+    y <- mapply(u, x)
+    plot(x, y,
+        main = 'Solution of the heat transfer equation',
+        type='l',
+        xlab='x',
+        ylab='y = f(x)',
+        cex.lab=1.5,
+        cex.axis=1.5,
+        cex.main=2
+    )
 }
 
-# plot_result()
-
-# effect <- function(){
-#       #tworzenie macierzy M
-#       M <- matrix(0, nrow = n, ncol = n)
-
-#       for (i in 1:n){
-#           for (j in 1:n){
-#               M[i,j] <- L(j-1, i-1)
-#           }
-#       }
-#       # tworzenie macierzy V
-#       V <- vector()
-#       for (i in 1:n){
-#           V = c(V, P(i-1))
-#       }
-#       #funkcja rozwiązuje układ macierzy M * u = V
-#       u = solve(M, V)
-    
-#       # kombinacja liniowa funkcji bazowych
-#       effect_function <- function(x){
-#           result = 0
-#           for (i in 1:n){
-#           result = result + u[i] * e(x, i - 1)
-#           }
-#           return(result)
-#       }
-#       return(effect_function)
-#   }
-
-#   #funkcja rysuje wykres dla równania transportu ciepła
-#   plot_effect <- function(){
-#     plot(seq(0, 2, 1/(100*n)), 
-#         mapply(effect(), seq(0, 2, 1/(100*n))),
-#         main = 'solution of the heat transfer equation',
-#         type='l',
-#         xlab='values x',
-#         ylab='values y=f(x)',
-#         cex.lab=1.5,
-#         cex.axis=1.5,
-#         cex.main=2)
-#   }
-
-
-  #funkcja rysuje wykres funkcji bazowych
-  plot_basis <- function(){
-    plot(seq(0, 2, 1/(100*n)), mapply(e, 1, seq(0, 2, 1/(100*n))), 
+# tworzenie wykresu funkcji bazowych
+plot_basis <- function() {
+    x <- seq(a, b, 1 / (100 * n))
+    y <- mapply(e, 1, x)
+    plot(x, y, 
         main = 'basic functions',
-        xlab='',
-        ylab='',
+        xlab='x',
+        ylab='y = f(x)',
         type='l',
         cex.axis=1.5,
-        cex.main=2)
-    for (i in 1:num_bfn){
-      lines(seq(0, 2, 1/(10*n)), mapply(e, i, seq(0, 2, 1/(10*n))))
+        cex.main=2
+    )
+    for (i in 2: num_bfn){
+        lines(x, mapply(e, i, x))
     }
-  }
+}
 
-#   # wywolanie funkcji/narysowania wykresu funkcji bazowych
-  
-plot_basis()
 
-#   # wywolanie funkcji/narysowania wykresu rozwiazania rownania transportu ciepla
-
-# plot_effect()
+# plot_basis()
+plot_result()

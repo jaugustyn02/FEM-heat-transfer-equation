@@ -92,31 +92,33 @@ if (n>0) {
 
   effect <- function(){
       #tworzenie macierzy M
-      M <- matrix(0, nrow = n+1, ncol = n+1)
+      M <- matrix(0, nrow = n, ncol = n)
 
-      for (i in 1:n+1){
-          for (j in 1:n+1){
+      for (i in 1:n){
+          for (j in 1:n){
               M[i,j] <- L(j-1, i-1)
           }
       }
       # tworzenie macierzy V
-      V <- rep(0, n+1)
-      for (i in 1:(n+1)){
+      V <- rep(0, n)
+      for (i in 1:n){
           V[i] = P(i-1)
       }
-      print(V)
+      # print(V)
       #funkcja rozwiązuje układ macierzy M * u = V
       u = solve(M, V)
-    
+      print(u)
+      # return(function(x) {return(x)})
       # kombinacja liniowa funkcji bazowych
       effect_function <- function(x){
           result = 0
-          for (i in 1:n+1){
+          for (i in 1:n){
           result = result + u[i] * e(x, i - 1)
           }
           return(result)
       }
       return(effect_function)
+      
   }
 
   #funkcja rysuje wykres dla równania transportu ciepła
