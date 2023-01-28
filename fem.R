@@ -17,7 +17,7 @@ num_e <- n + 1
 # Długość pojedynczego przedziału
 interval_len <- (b - a) / n
 
-# Współczynniki liniowe funkcji bazowych
+# Współczynniki kierunkowe funkcji bazowych
 a1 <- 1 / interval_len
 a2 <- -a1
 
@@ -58,7 +58,7 @@ e_prims_product <- function(i, j) {
     )
 }
 
-# Wartość lewej strony sformulowania wariacyjnego B(u,v)
+# Wartość lewej strony sformulowania wariacyjnego - B(u,v)
 # gdzie u(x), v(x) to odpowiednio i-ta, j-ta funkcja bazowa
 B <- function(i, j) {
     lower <- max(0, i - 2, j - 2) * interval_len
@@ -109,9 +109,9 @@ plot_result <- function(u) {
         type = "l",
         xlab = "x",
         ylab = "y = f(x)",
-        cex.lab = 1.75,
+        cex.lab = 1.25,
         cex.axis = 1.5,
-        cex.main = 2.25
+        cex.main = 1.5
     )
 }
 
