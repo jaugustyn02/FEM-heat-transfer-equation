@@ -4,7 +4,7 @@
 
 ![Tux, the Linux mascot](./images/equation.png)
 
-Wyprowadzenie sformułowania można znaleźć [tutaj](./SformułowanieWariacyjne.pdf)
+Wyprowadzenie sformułowania można znaleźć [tutaj](./variational_formulation.pdf)
 
 ## 2. Rozwiązanie równania i rysowanie wykresu
 
