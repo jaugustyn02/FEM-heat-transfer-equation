@@ -61,8 +61,8 @@ e_prims_product <- function(i, j) {
 # Wartość lewej strony sformulowania wariacyjnego - B(u,v)
 # gdzie u(x), v(x) to odpowiednio i-ta, j-ta funkcja bazowa
 B <- function(i, j) {
-    lower <- max(0, i - 2, j - 2) * interval_len
-    upper <- min(i, j) * interval_len
+    lower <- max(a, (i - 2) * interval_len, (j - 2) * interval_len)
+    upper <- min(i * interval_len, j * interval_len)
     return(
         e(i, 0) * e(j, 0) - def_integral(e_prims_product(i, j), lower, upper)
     )
