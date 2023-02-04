@@ -1,4 +1,4 @@
-# Projekt - rozwiązanie równania różniczkowego metodą elementów skończonych
+# Rozwiązanie równania różniczkowego metodą elementów skończonych
 
 ## 1. Sformułowanie wariacyjne równania transportu ciepła
 
