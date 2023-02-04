@@ -10,4 +10,4 @@ Wyprowadzenie sformułowania można znaleźć [tutaj](./SformułowanieWariacyjne
 
     Enter number of elements: 100
 
-![Tux, the Linux mascot](./images/resized-plot-100.png)
+![Tux, the Linux mascot](./images/plot3.png)
